@@ -1,104 +1,47 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbw5iU8gTb9au6M3x1kyrZ-dthEZmn7NlxHomvWcKf3QQUHSsobNKiNVI4j8dhlppKqBWw/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyQh_3tjLL4Ox48S91cphdCdrXnlNpfm1WGYPVrMPRA5bN3MHeR8AgMcndXh2u0n6lDqw/exec";
 
-let pagamentos = {};
-let totalVenda = 0;
-
-// ===============================
-// CALCULAR TOTAL
-// ===============================
-function calcularTotal() {
-  const preco = Number(document.getElementById("precoKg").value || 0);
-  const kg = Number(document.getElementById("kg").value || 0);
-
-  totalVenda = preco * kg;
-  document.getElementById("total").innerText =
-    "R$ " + totalVenda.toFixed(2).replace(".", ",");
-}
-
-// ===============================
-// TOGGLE PAGAMENTO
-// ===============================
-function togglePagamento(forma) {
-  const div = document.getElementById("pagamentos");
-
-  if (pagamentos[forma]) {
-    delete pagamentos[forma];
-    document.getElementById(`pay-${forma}`).remove();
-    return;
-  }
-
-  pagamentos[forma] = 0;
-
-  const input = document.createElement("input");
-  input.type = "number";
-  input.placeholder = forma;
-  input.className = "border p-2 rounded w-full mb-2";
-  input.id = `pay-${forma}`;
-  input.oninput = e => pagamentos[forma] = Number(e.target.value || 0);
-
-  div.appendChild(input);
-}
-
-// ===============================
-// FINALIZAR VENDA (GET SEM CORS)
-// ===============================
-async function finalizarVenda() {
-  const kg = Number(document.getElementById("kg").value || 0);
-
-  if (kg <= 0 || totalVenda <= 0) {
-    alert("Informe quantidade válida");
-    return;
-  }
-
-  const payload = encodeURIComponent(JSON.stringify({
-    action: "venda",
-    dados: {
-      total: totalVenda,
-      kg,
-      pagamentos
-    }
-  }));
-
-  const res = await fetch(`${API_URL}?payload=${payload}`);
-  const json = await res.json();
-
-  alert("Venda registrada!");
-  console.log(json);
-
-  pagamentos = {};
-  document.getElementById("pagamentos").innerHTML = "";
-}
-
-// ===============================
-// RELATÓRIO
-// ===============================
 async function buscarRelatorio() {
-  const payload = encodeURIComponent(JSON.stringify({
-    action: "relatorio"
-  }));
+  const dataFiltro = document.getElementById("filtroData").value;
+  const pagamentoFiltro = document.getElementById("filtroPagamento").value;
 
-  const res = await fetch(`${API_URL}?payload=${payload}`);
-  const json = await res.json();
+  const response = await fetch(API_URL);
+  const json = await response.json();
 
-  document.getElementById("relatorio").innerText =
-    JSON.stringify(json, null, 2);
-}
+  const vendas = json.vendas.slice(1); // remove cabeçalho
+  const tbody = document.getElementById("tabelaVendas");
+  tbody.innerHTML = "";
 
-// ===============================
-// EXCLUIR
-// ===============================
-async function excluirVenda() {
-  const id = document.getElementById("idExcluir").value.trim();
-  if (!id) return alert("Informe o ID");
+  let totalValor = 0;
+  let totalKg = 0;
 
-  const payload = encodeURIComponent(JSON.stringify({
-    action: "excluir",
-    id
-  }));
+  vendas.forEach(v => {
+    const [
+      id,
+      dataVenda,
+      valorTotal,
+      kg,
+      formaPagamento,
+      valorPago
+    ] = v;
 
-  const res = await fetch(`${API_URL}?payload=${payload}`);
-  const json = await res.json();
+    if (dataFiltro && !dataVenda.startsWith(dataFiltro)) return;
+    if (pagamentoFiltro && formaPagamento !== pagamentoFiltro) return;
 
-  alert("Venda excluída");
-  console.log(json);
+    totalValor += Number(valorTotal);
+    totalKg += Number(kg);
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${new Date(dataVenda).toLocaleString()}</td>
+      <td>${formaPagamento}</td>
+      <td>${kg}</td>
+      <td>R$ ${Number(valorTotal).toFixed(2)}</td>
+      <td>R$ ${Number(valorPago).toFixed(2)}</td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById("totalVendas").textContent = totalValor.toFixed(2);
+  document.getElementById("totalKg").textContent = totalKg.toFixed(2);
 }

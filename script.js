@@ -73,8 +73,28 @@ async function finalizarVenda() {
 // RELATÓRIO
 // ===============================
 async function buscarRelatorio() {
-  const dataFiltro = document.getElementById("filtroData").value;
-  const pagamentoFiltro = document.getElementById("filtroPagamento").value;
+  const filtroDataEl = document.getElementById("filtroData");
+  const filtroPagamentoEl = document.getElementById("filtroPagamento");
+  const tabelaEl = document.getElementById("tabelaVendas");
+
+  // Se estiver na tela antiga (relatório simples)
+  if (!tabelaEl) {
+    const payload = encodeURIComponent(JSON.stringify({
+      action: "relatorio"
+    }));
+
+    const res = await fetch(`${API_URL}?payload=${payload}`);
+    const json = await res.json();
+
+    document.getElementById("relatorio").innerText =
+      JSON.stringify(json, null, 2);
+
+    return;
+  }
+
+  // Se estiver na tela nova (relatório formatado)
+  const dataFiltro = filtroDataEl?.value || "";
+  const pagamentoFiltro = filtroPagamentoEl?.value || "";
 
   const payload = encodeURIComponent(JSON.stringify({
     action: "relatorio"
@@ -83,28 +103,19 @@ async function buscarRelatorio() {
   const res = await fetch(`${API_URL}?payload=${payload}`);
   const json = await res.json();
 
-  const vendas = json.vendas;
-  const linhas = vendas.slice(1); // remove cabeçalho
+  const vendas = json.vendas.slice(1);
 
   let totalVendas = 0;
   let totalKg = 0;
 
-  const tbody = document.getElementById("tabelaVendas");
-  tbody.innerHTML = "";
+  tabelaEl.innerHTML = "";
 
-  linhas.forEach(l => {
-    const [
-      id,
-      data,
-      total,
-      kg,
-      forma,
-      pago
-    ] = l;
+  vendas.forEach(l => {
+    const [, data, total, kg, forma, pago] = l;
 
-    const dataFormatada = new Date(data).toISOString().slice(0, 10);
+    const dataISO = new Date(data).toISOString().slice(0, 10);
 
-    if (dataFiltro && dataFormatada !== dataFiltro) return;
+    if (dataFiltro && dataISO !== dataFiltro) return;
     if (pagamentoFiltro && forma !== pagamentoFiltro) return;
 
     totalVendas += Number(pago);
@@ -119,7 +130,7 @@ async function buscarRelatorio() {
       <td>R$ ${Number(pago).toFixed(2)}</td>
     `;
 
-    tbody.appendChild(tr);
+    tabelaEl.appendChild(tr);
   });
 
   document.getElementById("totalVendas").innerText =
@@ -128,7 +139,6 @@ async function buscarRelatorio() {
   document.getElementById("totalKg").innerText =
     totalKg.toFixed(2);
 }
-
 
 
 // ===============================

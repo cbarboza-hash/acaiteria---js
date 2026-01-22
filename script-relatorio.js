@@ -20,26 +20,21 @@ async function buscarRelatorio() {
 
     let totalVendas = 0;
     let totalKg = 0;
-
     const kgPorVenda = {}; // rastrear KG único por ID
 
     vendas.forEach(l => {
       const [id, data, total, kgRaw, forma, pagoRaw] = l;
 
-      // Converte kg para número de forma segura
+      // Converte kg de forma segura
       let kg = 0;
-      if (typeof kgRaw === "string") {
-        kg = parseFloat(kgRaw.replace(",", "."));
-      } else if (typeof kgRaw === "number") {
-        kg = kgRaw;
+      if (kgRaw != null) {
+        kg = typeof kgRaw === "string" ? parseFloat(kgRaw.replace(",", ".")) : Number(kgRaw);
       }
 
-      // Converte pago para número de forma segura
+      // Converte pago de forma segura
       let pago = 0;
-      if (typeof pagoRaw === "string") {
-        pago = parseFloat(pagoRaw.replace(",", "."));
-      } else if (typeof pagoRaw === "number") {
-        pago = pagoRaw;
+      if (pagoRaw != null) {
+        pago = typeof pagoRaw === "string" ? parseFloat(pagoRaw.replace(",", ".")) : Number(pagoRaw);
       }
 
       // FILTROS DE DATA

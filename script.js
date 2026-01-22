@@ -1,4 +1,4 @@
-  const API_URL = "https://script.google.com/macros/s/AKfycbxaVLZRcNUlWmTV5dt_Ut6j4AZQUqbaF86obOTT62YuhW9Pwnhue3oFsKoW94lccUcoFg/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbxqe7sT3jqUswJucwkC3LewK9kQ50jKduBDAHhwfl24FRqFQq8aT2O8AQzKH_144HHeZA/exec";
 
 let pagamentos = {};
 let totalVenda = 0;

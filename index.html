@@ -8,24 +8,20 @@
 
 <body class="bg-gray-100 p-6">
 
-<div class="max-w-6xl mx-auto bg-white rounded-xl shadow p-6 space-y-6">
+<div class="max-w-6xl mx-auto bg-white rounded-xl shadow p-6">
 
-  <h1 class="text-3xl font-bold">🍧 Açaí do Bairro — Caixa</h1>
+  <h1 class="text-3xl font-bold mb-4">🍧 Açaí do Bairro — Caixa</h1>
 
-  <!-- ================= PREÇO / KG / TOTAL ================= -->
-  <div class="grid grid-cols-3 gap-4">
+  <!-- PREÇO / KG -->
+  <div class="grid grid-cols-3 gap-4 mb-6">
     <div>
-      <label class="font-semibold">Preço do KG (R$)</label>
-      <input id="precoKg" type="number" value="20" step="0.01"
-        class="w-full border p-2 rounded"
-        oninput="calcularTotal()">
+      <label>Preço do KG (R$)</label>
+      <input id="precoKg" type="number" value="20" class="w-full border p-2 rounded" oninput="calcularTotal()">
     </div>
 
     <div>
-      <label class="font-semibold">Quantidade (kg)</label>
-      <input id="kg" type="number" step="0.01"
-        class="w-full border p-2 rounded"
-        oninput="calcularTotal()">
+      <label>Quantidade (kg)</label>
+      <input id="kg" type="number" step="0.01" class="w-full border p-2 rounded" oninput="calcularTotal()">
     </div>
 
     <div class="bg-purple-600 text-white rounded p-4 text-center">
@@ -34,60 +30,49 @@
     </div>
   </div>
 
-  <!-- ================= FORMAS DE PAGAMENTO ================= -->
-  <h2 class="text-xl font-bold">💳 Pagamento</h2>
-
-  <div class="grid grid-cols-5 gap-3">
-    <button onclick="addPagamento('Dinheiro')" class="btn">Dinheiro</button>
-    <button onclick="addPagamento('PIX')" class="btn">PIX</button>
-    <button onclick="addPagamento('Crédito')" class="btn">Crédito</button>
-    <button onclick="addPagamento('Débito')" class="btn">Débito</button>
-    <button onclick="addPagamento('Outro')" class="btn">Outro</button>
+  <!-- PAGAMENTO -->
+  <div class="grid grid-cols-5 gap-3 mb-4">
+    <button onclick="abrirPagamento('dinheiro')" class="btn">Dinheiro</button>
+    <button onclick="abrirPagamento('pix')" class="btn">PIX</button>
+    <button onclick="abrirPagamento('credito')" class="btn">Crédito</button>
+    <button onclick="abrirPagamento('debito')" class="btn">Débito</button>
+    <button onclick="abrirPagamento('outro')" class="btn">Outro</button>
   </div>
 
-  <div id="pagamentos" class="space-y-2"></div>
+  <div id="pagamentos" class="mb-4"></div>
 
-  <button onclick="finalizarVenda()"
-    class="w-full bg-red-600 text-white py-3 rounded text-xl font-bold">
+  <button onclick="finalizarVenda()" class="w-full bg-red-600 text-white py-3 rounded text-xl">
     🔴 FINALIZAR VENDA
   </button>
 
-  <!-- ================= RELATÓRIO ================= -->
-  <hr>
+  <hr class="my-6">
 
-  <h2 class="text-xl font-bold">📊 Relatório do Dia</h2>
-  <button onclick="buscarRelatorio()"
-    class="bg-blue-600 text-white px-4 py-2 rounded mb-2">
+  <!-- RELATÓRIO -->
+  <h2 class="text-xl font-bold mb-2">📊 Relatório do Dia</h2>
+  <button onclick="buscarRelatorio()" class="bg-blue-600 text-white px-4 py-2 rounded mb-2">
     Atualizar Relatório
   </button>
+  <div id="relatorio"></div>
 
-  <div id="relatorio" class="text-sm"></div>
+  <hr class="my-6">
 
-  <!-- ================= EXCLUSÃO ================= -->
-  <hr>
-
-  <h2 class="text-xl font-bold">🗑️ Excluir Venda</h2>
-
-  <div class="flex gap-2">
-    <input id="idExcluir" placeholder="ID da venda"
-      class="border p-2 rounded w-1/2">
-    <button onclick="excluirVenda()"
-      class="bg-black text-white px-4 py-2 rounded">
-      Excluir
-    </button>
-  </div>
+  <!-- EXCLUSÃO -->
+  <h2 class="text-xl font-bold mb-2">🗑️ Excluir Venda</h2>
+  <input id="idExcluir" placeholder="ID da venda" class="border p-2 rounded w-1/2">
+  <button onclick="excluirVenda()" class="bg-black text-white px-4 py-2 rounded">
+    Excluir
+  </button>
 
 </div>
 
-<!-- ================= SCRIPT ================= -->
 <script src="script.js"></script>
 
 <style>
   .btn {
-    background: #eee;
-    padding: 10px;
-    border-radius: 8px;
-    font-weight: bold;
+    background:#eee;
+    padding:10px;
+    border-radius:8px;
+    font-weight:bold;
   }
 </style>
 

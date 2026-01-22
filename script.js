@@ -73,70 +73,80 @@ async function finalizarVenda() {
 // RELATÓRIO
 // ===============================
 async function buscarRelatorio() {
-
-  const dataFiltro = document.getElementById("filtroData")?.value || "";
-  const pagamentoFiltro = document.getElementById("filtroPagamento")?.value || "";
+  // 1. Captura os elementos do DOM
+  const filtroDataEl = document.getElementById("filtroData");
+  const filtroPagamentoEl = document.getElementById("filtroPagamento");
   const tabelaEl = document.getElementById("tabelaVendas");
   const relatorioPre = document.getElementById("relatorio");
+
+  // 2. Define os valores dos filtros (apenas UMA vez)
+  const dataFiltro = filtroDataEl?.value || "";
+  const pagamentoFiltro = filtroPagamentoEl?.value || "";
 
   const payload = encodeURIComponent(JSON.stringify({
     action: "relatorio"
   }));
 
-  const res = await fetch(`${API_URL}?payload=${payload}`);
-  const json = await res.json();
+  try {
+    const res = await fetch(`${API_URL}?payload=${payload}`);
+    const json = await res.json();
 
-  // ===============================
-  // TELA ANTIGA (JSON CRU)
-  // ===============================
-  if (!tabelaEl) {
-    if (relatorioPre) {
-      relatorioPre.innerText = JSON.stringify(json, null, 2);
+    // TELA ANTIGA (Se não houver tabela, exibe o JSON bruto)
+    if (!tabelaEl) {
+      if (relatorioPre) {
+        relatorioPre.innerText = JSON.stringify(json, null, 2);
+      }
+      return;
     }
-    return;
+
+    // TELA NOVA (Processamento da TABELA)
+    // Removemos as redeclarações que estavam aqui e causavam o erro
+    
+    const vendas = json.vendas.slice(1);
+    let totalVendas = 0;
+    let totalKg = 0;
+
+    tabelaEl.innerHTML = "";
+
+    vendas.forEach(l => {
+      const [, data, total, kg, forma, pago] = l;
+
+      // Tratativa básica para evitar erro de data inválida
+      let dataISO = "";
+      try {
+        dataISO = new Date(data).toISOString().slice(0, 10);
+      } catch (e) {
+        console.error("Data inválida:", data);
+      }
+
+      // Aplicação dos filtros
+      if (dataFiltro && dataISO !== dataFiltro) return;
+      if (pagamentoFiltro && forma !== pagamentoFiltro) return;
+
+      totalVendas += Number(pago || 0);
+      totalKg += Number(kg || 0);
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${new Date(data).toLocaleString("pt-BR")}</td>
+        <td>${forma}</td>
+        <td>${kg}</td>
+        <td>R$ ${Number(total).toFixed(2)}</td>
+        <td>R$ ${Number(pago).toFixed(2)}</td>
+      `;
+      tabelaEl.appendChild(tr);
+    });
+
+    // Atualiza os totais no rodapé/resumo
+    const totalVendasEl = document.getElementById("totalVendas");
+    const totalKgEl = document.getElementById("totalKg");
+
+    if (totalVendasEl) totalVendasEl.innerText = totalVendas.toFixed(2);
+    if (totalKgEl) totalKgEl.innerText = totalKg.toFixed(2);
+
+  } catch (erro) {
+    console.error("Erro ao buscar relatório:", erro);
   }
-
-  // ===============================
-  // TELA NOVA (TABELA)
-  // ===============================
-  const dataFiltro = filtroDataEl ? filtroDataEl.value : "";
-  const pagamentoFiltro = filtroPagamentoEl ? filtroPagamentoEl.value : "";
-
-  const vendas = json.vendas.slice(1);
-
-  let totalVendas = 0;
-  let totalKg = 0;
-
-  tabelaEl.innerHTML = "";
-
-  vendas.forEach(l => {
-    const [, data, total, kg, forma, pago] = l;
-
-    const dataISO = new Date(data).toISOString().slice(0, 10);
-
-    if (dataFiltro && dataISO !== dataFiltro) return;
-    if (pagamentoFiltro && forma !== pagamentoFiltro) return;
-
-    totalVendas += Number(pago);
-    totalKg += Number(kg);
-
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${new Date(data).toLocaleString("pt-BR")}</td>
-      <td>${forma}</td>
-      <td>${kg}</td>
-      <td>R$ ${Number(total).toFixed(2)}</td>
-      <td>R$ ${Number(pago).toFixed(2)}</td>
-    `;
-
-    tabelaEl.appendChild(tr);
-  });
-
-  const totalVendasEl = document.getElementById("totalVendas");
-  const totalKgEl = document.getElementById("totalKg");
-
-  if (totalVendasEl) totalVendasEl.innerText = totalVendas.toFixed(2);
-  if (totalKgEl) totalKgEl.innerText = totalKg.toFixed(2);
 }
 
 

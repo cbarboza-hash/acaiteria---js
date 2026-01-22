@@ -73,13 +73,12 @@ async function finalizarVenda() {
 // RELATÓRIO
 // ===============================
 async function buscarRelatorio() {
-  // 1. Captura os elementos do DOM
+  // 1. Capture os elementos e os valores APENAS UMA VEZ no início
   const filtroDataEl = document.getElementById("filtroData");
   const filtroPagamentoEl = document.getElementById("filtroPagamento");
   const tabelaEl = document.getElementById("tabelaVendas");
   const relatorioPre = document.getElementById("relatorio");
 
-  // 2. Define os valores dos filtros (apenas UMA vez)
   const dataFiltro = filtroDataEl?.value || "";
   const pagamentoFiltro = filtroPagamentoEl?.value || "";
 
@@ -87,68 +86,54 @@ async function buscarRelatorio() {
     action: "relatorio"
   }));
 
-  try {
-    const res = await fetch(`${API_URL}?payload=${payload}`);
-    const json = await res.json();
+  const res = await fetch(`${API_URL}?payload=${payload}`);
+  const json = await res.json();
 
-    // TELA ANTIGA (Se não houver tabela, exibe o JSON bruto)
-    if (!tabelaEl) {
-      if (relatorioPre) {
-        relatorioPre.innerText = JSON.stringify(json, null, 2);
-      }
-      return;
+  // Parte do JSON cru (caso não exista tabela no HTML)
+  if (!tabelaEl) {
+    if (relatorioPre) {
+      relatorioPre.innerText = JSON.stringify(json, null, 2);
     }
-
-    // TELA NOVA (Processamento da TABELA)
-    // Removemos as redeclarações que estavam aqui e causavam o erro
-    
-    const vendas = json.vendas.slice(1);
-    let totalVendas = 0;
-    let totalKg = 0;
-
-    tabelaEl.innerHTML = "";
-
-    vendas.forEach(l => {
-      const [, data, total, kg, forma, pago] = l;
-
-      // Tratativa básica para evitar erro de data inválida
-      let dataISO = "";
-      try {
-        dataISO = new Date(data).toISOString().slice(0, 10);
-      } catch (e) {
-        console.error("Data inválida:", data);
-      }
-
-      // Aplicação dos filtros
-      if (dataFiltro && dataISO !== dataFiltro) return;
-      if (pagamentoFiltro && forma !== pagamentoFiltro) return;
-
-      totalVendas += Number(pago || 0);
-      totalKg += Number(kg || 0);
-
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${new Date(data).toLocaleString("pt-BR")}</td>
-        <td>${forma}</td>
-        <td>${kg}</td>
-        <td>R$ ${Number(total).toFixed(2)}</td>
-        <td>R$ ${Number(pago).toFixed(2)}</td>
-      `;
-      tabelaEl.appendChild(tr);
-    });
-
-    // Atualiza os totais no rodapé/resumo
-    const totalVendasEl = document.getElementById("totalVendas");
-    const totalKgEl = document.getElementById("totalKg");
-
-    if (totalVendasEl) totalVendasEl.innerText = totalVendas.toFixed(2);
-    if (totalKgEl) totalKgEl.innerText = totalKg.toFixed(2);
-
-  } catch (erro) {
-    console.error("Erro ao buscar relatório:", erro);
+    return;
   }
-}
 
+  // === AQUI ESTAVA O ERRO: APAGUE AS LINHAS QUE REPETEM 'const dataFiltro' ===
+  
+  const vendas = json.vendas.slice(1);
+  let totalVendas = 0;
+  let totalKg = 0;
+
+  tabelaEl.innerHTML = "";
+
+  vendas.forEach(l => {
+    const [, data, total, kg, forma, pago] = l;
+    
+    // Converte a data da planilha para comparar com o filtro (AAAA-MM-DD)
+    const dataISO = new Date(data).toISOString().slice(0, 10);
+
+    if (dataFiltro && dataISO !== dataFiltro) return;
+    if (pagamentoFiltro && forma !== pagamentoFiltro) return;
+
+    totalVendas += Number(pago);
+    totalKg += Number(kg);
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${new Date(data).toLocaleString("pt-BR")}</td>
+      <td>${forma}</td>
+      <td>${kg}</td>
+      <td>R$ ${Number(total).toFixed(2)}</td>
+      <td>R$ ${Number(pago).toFixed(2)}</td>
+    `;
+    tabelaEl.appendChild(tr);
+  });
+
+  const totalVendasEl = document.getElementById("totalVendas");
+  const totalKgEl = document.getElementById("totalKg");
+
+  if (totalVendasEl) totalVendasEl.innerText = totalVendas.toFixed(2);
+  if (totalKgEl) totalKgEl.innerText = totalKg.toFixed(2);
+}
 
 
 // ===============================

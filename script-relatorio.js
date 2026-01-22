@@ -1,7 +1,7 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbzsezBa1QuxLv6AmVzJ4CH2UXxRevQVS74V6L9pRs5y_gExE5cp1n50oCmp8n7078mTSw/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxaVLZRcNUlWmTV5dt_Ut6j4AZQUqbaF86obOTT62YuhW9Pwnhue3oFsKoW94lccUcoFg/exec";
 
-// Torna a função global
-window.buscarRelatorio = async function() {
+// Função principal de relatório
+async function buscarRelatorio() {
   const tabelaEl = document.getElementById("tabelaVendas");
   const totalVendasEl = document.getElementById("totalVendas");
   const totalKgEl = document.getElementById("totalKg");
@@ -17,7 +17,6 @@ window.buscarRelatorio = async function() {
     const json = await res.json();
 
     const vendas = json.vendas.slice(1); // ignora cabeçalho
-
     let totalVendas = 0;
     let totalKg = 0;
 
@@ -25,8 +24,10 @@ window.buscarRelatorio = async function() {
 
     vendas.forEach(l => {
       const [, data, total, kg, forma, pago] = l;
-      const dataVendaFull = new Date(data); // data com hora
-      const dataVenda = new Date(dataVendaFull.getFullYear(), dataVendaFull.getMonth(), dataVendaFull.getDate()); // só ano-mês-dia
+
+      // Transformar data para ano-mês-dia para filtrar corretamente
+      const dataVendaFull = new Date(data);
+      const dataVenda = new Date(dataVendaFull.getFullYear(), dataVendaFull.getMonth(), dataVendaFull.getDate());
 
       const start = dataInicio ? new Date(dataInicio) : null;
       const end = dataFim ? new Date(dataFim) : null;
@@ -50,7 +51,6 @@ window.buscarRelatorio = async function() {
       tabelaEl.appendChild(tr);
     });
 
-    // Atualiza os totais no HTML
     totalVendasEl.innerText = totalVendas.toFixed(2);
     totalKgEl.innerText = totalKg.toFixed(2);
 
@@ -58,4 +58,9 @@ window.buscarRelatorio = async function() {
     console.error("Erro ao buscar relatório:", error);
     alert("Erro ao carregar relatório.");
   }
-}; // <-- <--- Muito importante! Fecha a função
+}
+
+// Registrando listener do botão
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("btnFiltrar").addEventListener("click", buscarRelatorio);
+});

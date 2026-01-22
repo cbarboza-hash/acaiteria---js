@@ -25,12 +25,17 @@ async function buscarRelatorio() {
     vendas.forEach(l => {
       const [, data, total, kg, forma, pago] = l;
 
-      // Transformar data para ano-mês-dia para filtrar corretamente
+      // Transformar data da planilha em ano-mês-dia
       const dataVendaFull = new Date(data);
-      const dataVenda = new Date(dataVendaFull.getFullYear(), dataVendaFull.getMonth(), dataVendaFull.getDate());
+      const ano = dataVendaFull.getFullYear();
+      const mes = dataVendaFull.getMonth(); // 0 a 11
+      const dia = dataVendaFull.getDate();
 
-      const start = dataInicio ? new Date(dataInicio) : null;
-      const end = dataFim ? new Date(dataFim) : null;
+      const dataVenda = new Date(ano, mes, dia); // apenas ano-mês-dia
+
+      // Converter filtros do input para datas locais
+      const start = dataInicio ? new Date(dataInicio + "T00:00:00") : null;
+      const end = dataFim ? new Date(dataFim + "T23:59:59") : null;
 
       // FILTROS
       if (start && dataVenda < start) return;
@@ -40,9 +45,12 @@ async function buscarRelatorio() {
       totalVendas += Number(pago || 0);
       totalKg += Number(kg || 0);
 
+      // Formata a data para DD/MM/YYYY
+      const dataFormatada = ("0" + dia).slice(-2) + "/" + ("0" + (mes + 1)).slice(-2) + "/" + ano;
+
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td class="border p-2">${dataVendaFull.toLocaleString("pt-BR")}</td>
+        <td class="border p-2">${dataFormatada}</td>
         <td class="border p-2">${forma}</td>
         <td class="border p-2">${kg}</td>
         <td class="border p-2">R$ ${Number(total).toFixed(2)}</td>
@@ -51,6 +59,7 @@ async function buscarRelatorio() {
       tabelaEl.appendChild(tr);
     });
 
+    // Atualiza totais
     totalVendasEl.innerText = totalVendas.toFixed(2);
     totalKgEl.innerText = totalKg.toFixed(2);
 
@@ -60,7 +69,10 @@ async function buscarRelatorio() {
   }
 }
 
-// Registrando listener do botão
+// Registrando listener do botão após o DOM carregar
 window.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("btnFiltrar").addEventListener("click", buscarRelatorio);
+  const btn = document.getElementById("btnFiltrar");
+  if (btn) {
+    btn.addEventListener("click", buscarRelatorio);
+  }
 });

@@ -73,6 +73,9 @@ async function finalizarVenda() {
 // RELATÓRIO
 // ===============================
 async function buscarRelatorio() {
+  const dataFiltro = document.getElementById("filtroData").value;
+  const pagamentoFiltro = document.getElementById("filtroPagamento").value;
+
   const payload = encodeURIComponent(JSON.stringify({
     action: "relatorio"
   }));
@@ -81,43 +84,51 @@ async function buscarRelatorio() {
   const json = await res.json();
 
   const vendas = json.vendas;
-  if (!vendas || vendas.length <= 1) {
-    document.getElementById("relatorio").innerHTML = "Nenhuma venda hoje.";
-    return;
-  }
+  const linhas = vendas.slice(1); // remove cabeçalho
 
-  const headers = vendas[0];
-  const linhas = vendas.slice(1);
+  let totalVendas = 0;
+  let totalKg = 0;
 
-  let html = `
-    <table class="w-full text-sm border border-gray-300">
-      <thead class="bg-gray-200">
-        <tr>
-          ${headers.map(h => `<th class="border px-2 py-1">${h}</th>`).join("")}
-        </tr>
-      </thead>
-      <tbody>
-  `;
+  const tbody = document.getElementById("tabelaVendas");
+  tbody.innerHTML = "";
 
-  linhas.forEach(linha => {
-    html += `
-      <tr class="odd:bg-white even:bg-gray-100">
-        ${linha.map(col => `
-          <td class="border px-2 py-1">
-            ${col instanceof Date ? new Date(col).toLocaleString("pt-BR") : col}
-          </td>
-        `).join("")}
-      </tr>
+  linhas.forEach(l => {
+    const [
+      id,
+      data,
+      total,
+      kg,
+      forma,
+      pago
+    ] = l;
+
+    const dataFormatada = new Date(data).toISOString().slice(0, 10);
+
+    if (dataFiltro && dataFormatada !== dataFiltro) return;
+    if (pagamentoFiltro && forma !== pagamentoFiltro) return;
+
+    totalVendas += Number(pago);
+    totalKg += Number(kg);
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${new Date(data).toLocaleString("pt-BR")}</td>
+      <td>${forma}</td>
+      <td>${kg}</td>
+      <td>R$ ${Number(total).toFixed(2)}</td>
+      <td>R$ ${Number(pago).toFixed(2)}</td>
     `;
+
+    tbody.appendChild(tr);
   });
 
-  html += `
-      </tbody>
-    </table>
-  `;
+  document.getElementById("totalVendas").innerText =
+    totalVendas.toFixed(2);
 
-  document.getElementById("relatorio").innerHTML = html;
+  document.getElementById("totalKg").innerText =
+    totalKg.toFixed(2);
 }
+
 
 
 // ===============================

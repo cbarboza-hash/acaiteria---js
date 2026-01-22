@@ -41,3 +41,15 @@ async function buscarRelatorio() {
   const json = await res.json();
   console.log(json);
 }
+
+// ================================
+// CONTROLE DE TELAS (UMA POR VEZ)
+// ================================
+function toggle(id) {
+  const telas = document.querySelectorAll(".tela");
+  telas.forEach(t => t.style.display = "none");
+
+  const ativa = document.getElementById(id);
+  if (ativa) ativa.style.display = "block";
+}
+

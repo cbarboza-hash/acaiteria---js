@@ -27,18 +27,18 @@ window.buscarRelatorio = async function() {
       const [, data, total, kg, forma, pago] = l;
       const dataVendaFull = new Date(data); // data com hora
       const dataVenda = new Date(dataVendaFull.getFullYear(), dataVendaFull.getMonth(), dataVendaFull.getDate()); // só ano-mês-dia
-    
+
       const start = dataInicio ? new Date(dataInicio) : null;
       const end = dataFim ? new Date(dataFim) : null;
-    
+
       // FILTROS
       if (start && dataVenda < start) return;
       if (end && dataVenda > end) return;
       if (filtroPagamento && forma !== filtroPagamento) return;
-    
+
       totalVendas += Number(pago || 0);
       totalKg += Number(kg || 0);
-    
+
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td class="border p-2">${dataVendaFull.toLocaleString("pt-BR")}</td>
@@ -48,5 +48,14 @@ window.buscarRelatorio = async function() {
         <td class="border p-2">R$ ${Number(pago).toFixed(2)}</td>
       `;
       tabelaEl.appendChild(tr);
-});
+    });
 
+    // Atualiza os totais no HTML
+    totalVendasEl.innerText = totalVendas.toFixed(2);
+    totalKgEl.innerText = totalKg.toFixed(2);
+
+  } catch (error) {
+    console.error("Erro ao buscar relatório:", error);
+    alert("Erro ao carregar relatório.");
+  }
+}; // <-- <--- Muito importante! Fecha a função

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>📊 Relatório de Vendas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+
+<div class="max-w-6xl mx-auto bg-white rounded-xl shadow p-6">
+  <h1 class="text-3xl font-bold mb-6">📊 Relatório de Vendas</h1>
+
+  <!-- FILTROS -->
+  <div class="grid grid-cols-3 gap-4 mb-6">
+    <div>
+      <label>Data inicial</label>
+      <input type="date" id="dataInicio" class="w-full border p-2 rounded">
+    </div>
+    <div>
+      <label>Data final</label>
+      <input type="date" id="dataFim" class="w-full border p-2 rounded">
+    </div>
+    <div>
+      <label>Forma de Pagamento</label>
+      <select id="filtroPagamento" class="w-full border p-2 rounded">
+        <option value="">Todas</option>
+        <option value="Dinheiro">Dinheiro</option>
+        <option value="PIX">PIX</option>
+        <option value="Crédito">Crédito</option>
+        <option value="Débito">Débito</option>
+        <option value="Outro">Outro</option>
+      </select>
+    </div>
+  </div>
+
+  <button onclick="buscarRelatorio()" class="bg-blue-600 text-white px-4 py-2 rounded mb-4">Aplicar Filtros</button>
+
+  <!-- RESUMO -->
+  <div class="mb-4">
+    <p><strong>Total Vendas:</strong> R$ <span id="totalVendas">0,00</span></p>
+    <p><strong>Total KG:</strong> <span id="totalKg">0,00</span> kg</p>
+  </div>
+
+  <!-- TABELA DE VENDAS -->
+  <table class="table-auto w-full border-collapse border border-gray-300">
+    <thead>
+      <tr class="bg-gray-200">
+        <th class="border p-2">Data</th>
+        <th class="border p-2">Forma</th>
+        <th class="border p-2">KG</th>
+        <th class="border p-2">Total</th>
+        <th class="border p-2">Pago</th>
+      </tr>
+    </thead>
+    <tbody id="tabelaVendas"></tbody>
+  </table>
+</div>
+
+<script src="script-relatorio.js"></script>
+</body>
+</html>

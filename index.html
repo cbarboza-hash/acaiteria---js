@@ -8,121 +8,64 @@
 
 <body class="bg-gray-100 p-6">
 
-<div class="max-w-6xl mx-auto bg-white rounded-xl shadow p-6 space-y-10">
+<div class="max-w-6xl mx-auto bg-white rounded-xl shadow p-6">
 
-  <!-- ========================= -->
-  <!-- 🔴 CAIXA / VENDA -->
-  <!-- ========================= -->
-  <section>
-    <h1 class="text-3xl font-bold mb-6">🍧 Açaí do Bairro — Caixa</h1>
+  <h1 class="text-3xl font-bold mb-6">🍧 Açaí do Bairro — Caixa</h1>
 
-    <!-- PREÇO / KG -->
-    <div class="grid grid-cols-3 gap-4 mb-6">
-      <div>
-        <label class="font-semibold">Preço do KG (R$)</label>
-        <input id="precoKg" type="number" value="20"
-          class="w-full border p-2 rounded"
-          oninput="calcularTotal()">
-      </div>
-
-      <div>
-        <label class="font-semibold">Quantidade (kg)</label>
-        <input id="kg" type="number" step="0.01"
-          class="w-full border p-2 rounded"
-          oninput="calcularTotal()">
-      </div>
-
-      <div class="bg-purple-600 text-white rounded p-4 text-center">
-        <div class="text-sm">TOTAL</div>
-        <div id="total" class="text-3xl font-bold">R$ 0,00</div>
-      </div>
+  <!-- PREÇO / KG -->
+  <div class="grid grid-cols-3 gap-4 mb-6">
+    <div>
+      <label>Preço do KG (R$)</label>
+      <input id="precoKg" type="number" value="20" class="w-full border p-2 rounded" oninput="calcularTotal()">
     </div>
 
-    <!-- PAGAMENTOS -->
-    <h2 class="font-bold mb-2">Forma de Pagamento</h2>
-    <div class="grid grid-cols-5 gap-3 mb-4">
-      <button onclick="togglePagamento('Dinheiro')" class="btn">Dinheiro</button>
-      <button onclick="togglePagamento('PIX')" class="btn">PIX</button>
-      <button onclick="togglePagamento('Crédito')" class="btn">Crédito</button>
-      <button onclick="togglePagamento('Débito')" class="btn">Débito</button>
-      <button onclick="togglePagamento('Outro')" class="btn">Outro</button>
+    <div>
+      <label>Quantidade (kg)</label>
+      <input id="kg" type="number" step="0.01" class="w-full border p-2 rounded" oninput="calcularTotal()">
     </div>
 
-    <div id="pagamentos" class="mb-4"></div>
-
-    <button onclick="finalizarVenda()"
-      class="w-full bg-red-600 text-white py-3 rounded text-xl font-bold">
-      🔴 FINALIZAR VENDA
-    </button>
-  </section>
-
-  <hr>
-
-  <!-- ========================= -->
-  <!-- 📊 RELATÓRIO -->
-  <!-- ========================= -->
-  <section>
-    <h2 class="text-2xl font-bold mb-4">📊 Relatório de Vendas</h2>
-
-    <!-- FILTROS -->
-    <div class="flex gap-4 mb-4">
-      <input type="date" id="filtroData" class="border p-2 rounded">
-      <select id="filtroPagamento" class="border p-2 rounded">
-        <option value="">Todos os pagamentos</option>
-        <option value="Dinheiro">Dinheiro</option>
-        <option value="PIX">PIX</option>
-        <option value="Crédito">Crédito</option>
-        <option value="Débito">Débito</option>
-      </select>
-      <button onclick="buscarRelatorio()"
-        class="bg-blue-600 text-white px-4 rounded">
-        Buscar
-      </button>
+    <div class="bg-purple-600 text-white rounded p-4 text-center">
+      <div class="text-sm">TOTAL</div>
+      <div id="total" class="text-3xl font-bold">R$ 0,00</div>
     </div>
+  </div>
 
-    <!-- RESUMO -->
-    <div class="flex gap-6 mb-4 font-semibold">
-      <div>Total Vendido: R$ <span id="totalVendas">0.00</span></div>
-      <div>Total KG: <span id="totalKg">0</span> kg</div>
-    </div>
+  <!-- PAGAMENTOS -->
+  <h2 class="font-bold mb-2">Forma de Pagamento</h2>
+  <div class="grid grid-cols-5 gap-3 mb-4">
+    <button onclick="togglePagamento('Dinheiro')" class="btn">Dinheiro</button>
+    <button onclick="togglePagamento('PIX')" class="btn">PIX</button>
+    <button onclick="togglePagamento('Crédito')" class="btn">Crédito</button>
+    <button onclick="togglePagamento('Débito')" class="btn">Débito</button>
+    <button onclick="togglePagamento('Outro')" class="btn">Outro</button>
+  </div>
 
-    <!-- TABELA -->
-    <div class="overflow-x-auto">
-      <table class="w-full border">
-        <thead class="bg-gray-200">
-          <tr>
-            <th class="border p-2">Data</th>
-            <th class="border p-2">Pagamento</th>
-            <th class="border p-2">KG</th>
-            <th class="border p-2">Total</th>
-            <th class="border p-2">Pago</th>
-          </tr>
-        </thead>
-        <tbody id="tabelaVendas"></tbody>
-      </table>
-    </div>
-  </section>
+  <div id="pagamentos" class="mb-4"></div>
 
-  <hr>
+  <button onclick="finalizarVenda()" class="w-full bg-red-600 text-white py-3 rounded text-xl">
+    🔴 FINALIZAR VENDA
+  </button>
 
-  <!-- ========================= -->
-  <!-- 🗑️ EXCLUSÃO -->
-  <!-- ========================= -->
-  <section>
-    <h2 class="text-xl font-bold mb-2">🗑️ Excluir Venda</h2>
-    <div class="flex gap-3">
-      <input id="idExcluir" placeholder="ID da venda"
-        class="border p-2 rounded w-1/2">
-      <button onclick="excluirVenda()"
-        class="bg-black text-white px-4 py-2 rounded">
-        Excluir
-      </button>
-    </div>
-  </section>
+  <hr class="my-6">
+
+  <!-- RELATÓRIO -->
+  <h2 class="text-xl font-bold mb-2">📊 Relatório do Dia</h2>
+  <button onclick="buscarRelatorio()" class="bg-blue-600 text-white px-4 py-2 rounded mb-2">
+    Buscar Relatório
+  </button>
+  <pre id="relatorio" class="bg-gray-100 p-3 rounded"></pre>
+
+  <hr class="my-6">
+
+  <!-- EXCLUSÃO -->
+  <h2 class="text-xl font-bold mb-2">🗑️ Excluir Venda</h2>
+  <input id="idExcluir" placeholder="ID da venda" class="border p-2 rounded w-1/2">
+  <button onclick="excluirVenda()" class="bg-black text-white px-4 py-2 rounded">
+    Excluir
+  </button>
 
 </div>
 
-<!-- SCRIPT ÚNICO -->
 <script src="script.js"></script>
 
 <style>
@@ -131,7 +74,6 @@
     padding: 10px;
     border-radius: 8px;
     font-weight: bold;
-    cursor: pointer;
   }
 </style>
 

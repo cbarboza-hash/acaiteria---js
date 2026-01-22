@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbzsezBa1QuxLv6AmVzJ4CH2UXxRevQVS74V6L9pRs5y_gExE5cp1n50oCmp8n7078mTSw/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbzsezBa1QuxLv6AmVzJ4CH2UXxRevQVS74V6L9pRs5y_gExE5cp1n50oCmp8n7078mTSw/exec";
 
 let pagamentos = {};
 let totalVenda = 0;
@@ -72,69 +72,65 @@ async function finalizarVenda() {
 // ===============================
 // RELATÓRIO
 // ===============================
+const API_URL = "https://script.google.com/macros/s/AKfycbzsezBa1QuxLv6AmVzJ4CH2UXxRevQVS74V6L9pRs5y_gExE5cp1n50oCmp8n7078mTSw/exec";
+
 async function buscarRelatorio() {
   const tabelaEl = document.getElementById("tabelaVendas");
-  const relatorioPre = document.getElementById("relatorio");
+  const totalVendasEl = document.getElementById("totalVendas");
+  const totalKgEl = document.getElementById("totalKg");
 
-  // Prepara a chamada para a API
-  const payload = encodeURIComponent(JSON.stringify({
-    action: "relatorio"
-  }));
+  const dataInicio = document.getElementById("dataInicio").value;
+  const dataFim = document.getElementById("dataFim").value;
+  const filtroPagamento = document.getElementById("filtroPagamento").value;
+
+  const payload = encodeURIComponent(JSON.stringify({ action: "relatorio" }));
 
   try {
     const res = await fetch(`${API_URL}?payload=${payload}`);
     const json = await res.json();
 
-    // Se não houver a tabela no HTML, mostra o JSON bruto (modo debug)
-    if (!tabelaEl) {
-      if (relatorioPre) {
-        relatorioPre.innerText = JSON.stringify(json, null, 2);
-      }
-      return;
-    }
-
-    // Pega as vendas (pulando o cabeçalho da planilha)
-    const vendas = json.vendas.slice(1);
+    const vendas = json.vendas.slice(1); // ignora cabeçalho
 
     let totalVendas = 0;
     let totalKg = 0;
 
-    // Limpa a tabela antes de preencher
     tabelaEl.innerHTML = "";
 
     vendas.forEach(l => {
-      // Desestrutura os dados da linha da planilha
       const [, data, total, kg, forma, pago] = l;
 
-      // Soma os totais (sem filtros, pega tudo)
+      const dataVenda = new Date(data);
+      const start = dataInicio ? new Date(dataInicio) : null;
+      const end = dataFim ? new Date(dataFim) : null;
+
+      // FILTROS
+      if (start && dataVenda < start) return;
+      if (end && dataVenda > end) return;
+      if (filtroPagamento && forma !== filtroPagamento) return;
+
       totalVendas += Number(pago || 0);
       totalKg += Number(kg || 0);
 
-      // Cria a linha da tabela
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${new Date(data).toLocaleString("pt-BR")}</td>
-        <td>${forma}</td>
-        <td>${kg}</td>
-        <td>R$ ${Number(total).toFixed(2)}</td>
-        <td>R$ ${Number(pago).toFixed(2)}</td>
+        <td class="border p-2">${dataVenda.toLocaleString("pt-BR")}</td>
+        <td class="border p-2">${forma}</td>
+        <td class="border p-2">${kg}</td>
+        <td class="border p-2">R$ ${Number(total).toFixed(2)}</td>
+        <td class="border p-2">R$ ${Number(pago).toFixed(2)}</td>
       `;
-
       tabelaEl.appendChild(tr);
     });
 
-    // Atualiza os elementos de total no HTML
-    const totalVendasEl = document.getElementById("totalVendas");
-    const totalKgEl = document.getElementById("totalKg");
-
-    if (totalVendasEl) totalVendasEl.innerText = totalVendas.toFixed(2);
-    if (totalKgEl) totalKgEl.innerText = totalKg.toFixed(2);
+    totalVendasEl.innerText = totalVendas.toFixed(2);
+    totalKgEl.innerText = totalKg.toFixed(2);
 
   } catch (error) {
-    console.error("Erro ao carregar relatório:", error);
-    alert("Erro ao buscar dados da planilha.");
+    console.error("Erro ao buscar relatório:", error);
+    alert("Erro ao carregar relatório.");
   }
 }
+
 
 
 // ===============================

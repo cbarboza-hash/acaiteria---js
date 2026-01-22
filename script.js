@@ -1,185 +1,104 @@
-// ======================================================
-// CONFIG
-// ======================================================
-const API_URL =
-  "https://script.google.com/macros/s/AKfycbw_I82WYppvFLupWJBetALbSQxPgqvitB_tPdARWta2N-wYEnZmdBW0wuT5rvM5eI1WHw/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzsezBa1QuxLv6AmVzJ4CH2UXxRevQVS74V6L9pRs5y_gExE5cp1n50oCmp8n7078mTSw/exec";
 
-let pagamentosSelecionados = {};
+let pagamentos = {};
+let totalVenda = 0;
 
-// ======================================================
+// ===============================
 // CALCULAR TOTAL
-// ======================================================
+// ===============================
 function calcularTotal() {
-  const precoKg = parseFloat(document.getElementById("precoKg").value) || 0;
-  const kg = parseFloat(document.getElementById("kg").value) || 0;
+  const preco = Number(document.getElementById("precoKg").value || 0);
+  const kg = Number(document.getElementById("kg").value || 0);
 
-  const total = precoKg * kg;
-
+  totalVenda = preco * kg;
   document.getElementById("total").innerText =
-    total.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL"
-    });
+    "R$ " + totalVenda.toFixed(2).replace(".", ",");
 }
-window.calcularTotal = calcularTotal;
 
-// ======================================================
-// PAGAMENTOS
-// ======================================================
+// ===============================
+// TOGGLE PAGAMENTO
+// ===============================
 function togglePagamento(forma) {
-  const container = document.getElementById("pagamentos");
+  const div = document.getElementById("pagamentos");
 
-  // remove se já existir
-  if (pagamentosSelecionados[forma] !== undefined) {
-    delete pagamentosSelecionados[forma];
-    document.getElementById(`pg-${forma}`)?.remove();
+  if (pagamentos[forma]) {
+    delete pagamentos[forma];
+    document.getElementById(`pay-${forma}`).remove();
     return;
   }
 
-  pagamentosSelecionados[forma] = 0;
+  pagamentos[forma] = 0;
 
-  const div = document.createElement("div");
-  div.id = `pg-${forma}`;
-  div.className = "flex gap-3 items-center mb-2";
+  const input = document.createElement("input");
+  input.type = "number";
+  input.placeholder = forma;
+  input.className = "border p-2 rounded w-full mb-2";
+  input.id = `pay-${forma}`;
+  input.oninput = e => pagamentos[forma] = Number(e.target.value || 0);
 
-  div.innerHTML = `
-    <span class="w-28 font-semibold">${forma}</span>
-    <input
-      type="number"
-      class="border p-2 rounded w-32"
-      placeholder="R$"
-      oninput="atualizarPagamento('${forma}', this.value)"
-    />
-    <button onclick="togglePagamento('${forma}')"
-      class="text-red-600 font-bold">✖</button>
-  `;
-
-  container.appendChild(div);
+  div.appendChild(input);
 }
-window.togglePagamento = togglePagamento;
 
-function atualizarPagamento(forma, valor) {
-  pagamentosSelecionados[forma] = Number(valor) || 0;
-}
-window.atualizarPagamento = atualizarPagamento;
-
-// ======================================================
-// FINALIZAR VENDA
-// ======================================================
+// ===============================
+// FINALIZAR VENDA (GET SEM CORS)
+// ===============================
 async function finalizarVenda() {
-  const precoKg = parseFloat(document.getElementById("precoKg").value) || 0;
-  const kg = parseFloat(document.getElementById("kg").value) || 0;
-  const total = precoKg * kg;
+  const kg = Number(document.getElementById("kg").value || 0);
 
-  if (!kg || total <= 0) {
-    alert("Informe o peso do açaí.");
+  if (kg <= 0 || totalVenda <= 0) {
+    alert("Informe quantidade válida");
     return;
   }
 
-  if (Object.keys(pagamentosSelecionados).length === 0) {
-    alert("Informe ao menos uma forma de pagamento.");
-    return;
-  }
+  const payload = encodeURIComponent(JSON.stringify({
+    action: "venda",
+    dados: {
+      total: totalVenda,
+      kg,
+      pagamentos
+    }
+  }));
 
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      action: "venda",
-      dados: {
-        total,
-        kg,
-        pagamentos: pagamentosSelecionados
-      }
-    })
-  });
-
+  const res = await fetch(`${API_URL}?payload=${payload}`);
   const json = await res.json();
 
-  if (json.ok) {
-    alert("Venda registrada com sucesso!");
-    document.getElementById("kg").value = "";
-    document.getElementById("pagamentos").innerHTML = "";
-    document.getElementById("total").innerText = "R$ 0,00";
-    pagamentosSelecionados = {};
-    buscarRelatorio();
-  } else {
-    alert("Erro ao registrar venda");
-  }
-}
-window.finalizarVenda = finalizarVenda;
+  alert("Venda registrada!");
+  console.log(json);
 
-// ======================================================
+  pagamentos = {};
+  document.getElementById("pagamentos").innerHTML = "";
+}
+
+// ===============================
 // RELATÓRIO
-// ======================================================
+// ===============================
 async function buscarRelatorio() {
-  const dataFiltro = document.getElementById("filtroData").value;
-  const pagamentoFiltro = document.getElementById("filtroPagamento").value;
+  const payload = encodeURIComponent(JSON.stringify({
+    action: "relatorio"
+  }));
 
-  const response = await fetch(API_URL);
-  const json = await response.json();
-
-  const vendas = json.vendas.slice(1); // remove cabeçalho
-  const tbody = document.getElementById("tabelaVendas");
-  tbody.innerHTML = "";
-
-  let totalValor = 0;
-  let totalKg = 0;
-
-  vendas.forEach(v => {
-    const [id, dataVenda, valorTotal, kg, forma, valorPago] = v;
-
-    const dataISO = new Date(dataVenda).toISOString().slice(0, 10);
-
-    if (dataFiltro && dataISO !== dataFiltro) return;
-    if (pagamentoFiltro && forma !== pagamentoFiltro) return;
-
-    totalValor += Number(valorTotal);
-    totalKg += Number(kg);
-
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="border p-2">${new Date(dataVenda).toLocaleString()}</td>
-      <td class="border p-2">${forma}</td>
-      <td class="border p-2">${kg}</td>
-      <td class="border p-2">R$ ${Number(valorTotal).toFixed(2)}</td>
-      <td class="border p-2">R$ ${Number(valorPago).toFixed(2)}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  document.getElementById("totalVendas").textContent =
-    totalValor.toFixed(2);
-  document.getElementById("totalKg").textContent =
-    totalKg.toFixed(2);
-}
-window.buscarRelatorio = buscarRelatorio;
-
-// ======================================================
-// EXCLUSÃO
-// ======================================================
-async function excluirVenda() {
-  const id = document.getElementById("idExcluir").value;
-  if (!id) return alert("Informe o ID da venda");
-
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "excluir", id })
-  });
-
+  const res = await fetch(`${API_URL}?payload=${payload}`);
   const json = await res.json();
 
-  if (json.ok) {
-    alert("Venda excluída");
-    buscarRelatorio();
-  } else {
-    alert("Erro ao excluir");
-  }
+  document.getElementById("relatorio").innerText =
+    JSON.stringify(json, null, 2);
 }
-window.excluirVenda = excluirVenda;
 
-// ======================================================
-// AUTO LOAD
-// ======================================================
-document.addEventListener("DOMContentLoaded", buscarRelatorio);
+// ===============================
+// EXCLUIR
+// ===============================
+async function excluirVenda() {
+  const id = document.getElementById("idExcluir").value.trim();
+  if (!id) return alert("Informe o ID");
+
+  const payload = encodeURIComponent(JSON.stringify({
+    action: "excluir",
+    id
+  }));
+
+  const res = await fetch(`${API_URL}?payload=${payload}`);
+  const json = await res.json();
+
+  alert("Venda excluída");
+  console.log(json);
+}

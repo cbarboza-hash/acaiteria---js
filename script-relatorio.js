@@ -25,7 +25,11 @@ async function buscarRelatorio() {
     const kgPorVenda = {};
 
     vendas.forEach(l => {
-      const [id, data, total, kg, forma, pago] = l;
+      const [id, data, total, kgRaw, forma, pagoRaw] = l;
+
+      // Converte kg e pago para número
+      const kg = Number(String(kgRaw).replace(",", "."));
+      const pago = Number(String(pagoRaw).replace(",", "."));
 
       // FILTROS DE DATA
       const parts = data.split("/"); // assume formato DD/MM/YYYY
@@ -40,12 +44,12 @@ async function buscarRelatorio() {
 
       // Somar o KG apenas uma vez por venda
       if (!kgPorVenda[id]) {
-        totalKg += parseFloat(kg.replace(",", ".") || 0);
+        totalKg += kg;
         kgPorVenda[id] = true;
       }
 
       // Somar valor pago normalmente
-      totalVendas += parseFloat(pago.replace(",", ".") || 0);
+      totalVendas += pago;
 
       // Formata data para DD/MM/YYYY
       const dataFormatada = ("0" + parts[0]).slice(-2) + "/" + ("0" + parts[1]).slice(-2) + "/" + parts[2];
@@ -56,7 +60,7 @@ async function buscarRelatorio() {
         <td class="border p-2">${forma}</td>
         <td class="border p-2">${kg}</td>
         <td class="border p-2">R$ ${Number(total).toFixed(2)}</td>
-        <td class="border p-2">R$ ${Number(pago).toFixed(2)}</td>
+        <td class="border p-2">R$ ${pago.toFixed(2)}</td>
       `;
       tabelaEl.appendChild(tr);
     });

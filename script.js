@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbxmYO4YAM0GBoC6xAkcJ5fhL6TDSw9yAXXTJVjI4JhgRahJWjxXpDhkCp3FXsnG7KmSwg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwacwYIMMo3bkeKzbH9OZ40HxZSZe7HdyZ0GmeEEgrSx9Ewh-azGugHI9ZZ_KCn9HYS/exec";
 
 function calcularTotal() {
   const precoKg = parseFloat(document.getElementById("precoKg").value) || 0;

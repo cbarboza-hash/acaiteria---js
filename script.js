@@ -2,7 +2,7 @@
 // CONFIG
 // ======================================================
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbwacwYIMMo3bkeKzbH9OZ40HxZSZe7HdyZ0GmeEEgrSx9Ewh-azGugHI9ZZ_KCn9HYS/exec";
+  "https://script.google.com/macros/s/AKfycbw_I82WYppvFLupWJBetALbSQxPgqvitB_tPdARWta2N-wYEnZmdBW0wuT5rvM5eI1WHw/exec";
 
 let pagamentosSelecionados = {};
 

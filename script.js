@@ -74,8 +74,8 @@ async function finalizarVenda() {
 // ===============================
 async function buscarRelatorio() {
 
-  const filtroDataEl = document.getElementById("filtroData");
-  const filtroPagamentoEl = document.getElementById("filtroPagamento");
+  const dataFiltro = document.getElementById("filtroData")?.value || "";
+  const pagamentoFiltro = document.getElementById("filtroPagamento")?.value || "";
   const tabelaEl = document.getElementById("tabelaVendas");
   const relatorioPre = document.getElementById("relatorio");
 

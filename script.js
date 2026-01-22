@@ -73,28 +73,11 @@ async function finalizarVenda() {
 // RELATÓRIO
 // ===============================
 async function buscarRelatorio() {
+
   const filtroDataEl = document.getElementById("filtroData");
   const filtroPagamentoEl = document.getElementById("filtroPagamento");
   const tabelaEl = document.getElementById("tabelaVendas");
-
-  // Se estiver na tela antiga (relatório simples)
-  if (!tabelaEl) {
-    const payload = encodeURIComponent(JSON.stringify({
-      action: "relatorio"
-    }));
-
-    const res = await fetch(`${API_URL}?payload=${payload}`);
-    const json = await res.json();
-
-    document.getElementById("relatorio").innerText =
-      JSON.stringify(json, null, 2);
-
-    return;
-  }
-
-  // Se estiver na tela nova (relatório formatado)
-  const dataFiltro = filtroDataEl?.value || "";
-  const pagamentoFiltro = filtroPagamentoEl?.value || "";
+  const relatorioPre = document.getElementById("relatorio");
 
   const payload = encodeURIComponent(JSON.stringify({
     action: "relatorio"
@@ -102,6 +85,22 @@ async function buscarRelatorio() {
 
   const res = await fetch(`${API_URL}?payload=${payload}`);
   const json = await res.json();
+
+  // ===============================
+  // TELA ANTIGA (JSON CRU)
+  // ===============================
+  if (!tabelaEl) {
+    if (relatorioPre) {
+      relatorioPre.innerText = JSON.stringify(json, null, 2);
+    }
+    return;
+  }
+
+  // ===============================
+  // TELA NOVA (TABELA)
+  // ===============================
+  const dataFiltro = filtroDataEl ? filtroDataEl.value : "";
+  const pagamentoFiltro = filtroPagamentoEl ? filtroPagamentoEl.value : "";
 
   const vendas = json.vendas.slice(1);
 
@@ -133,12 +132,13 @@ async function buscarRelatorio() {
     tabelaEl.appendChild(tr);
   });
 
-  document.getElementById("totalVendas").innerText =
-    totalVendas.toFixed(2);
+  const totalVendasEl = document.getElementById("totalVendas");
+  const totalKgEl = document.getElementById("totalKg");
 
-  document.getElementById("totalKg").innerText =
-    totalKg.toFixed(2);
+  if (totalVendasEl) totalVendasEl.innerText = totalVendas.toFixed(2);
+  if (totalKgEl) totalKgEl.innerText = totalKg.toFixed(2);
 }
+
 
 
 // ===============================

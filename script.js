@@ -80,9 +80,45 @@ async function buscarRelatorio() {
   const res = await fetch(`${API_URL}?payload=${payload}`);
   const json = await res.json();
 
-  document.getElementById("relatorio").innerText =
-    JSON.stringify(json, null, 2);
+  const vendas = json.vendas;
+  if (!vendas || vendas.length <= 1) {
+    document.getElementById("relatorio").innerHTML = "Nenhuma venda hoje.";
+    return;
+  }
+
+  const headers = vendas[0];
+  const linhas = vendas.slice(1);
+
+  let html = `
+    <table class="w-full text-sm border border-gray-300">
+      <thead class="bg-gray-200">
+        <tr>
+          ${headers.map(h => `<th class="border px-2 py-1">${h}</th>`).join("")}
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  linhas.forEach(linha => {
+    html += `
+      <tr class="odd:bg-white even:bg-gray-100">
+        ${linha.map(col => `
+          <td class="border px-2 py-1">
+            ${col instanceof Date ? new Date(col).toLocaleString("pt-BR") : col}
+          </td>
+        `).join("")}
+      </tr>
+    `;
+  });
+
+  html += `
+      </tbody>
+    </table>
+  `;
+
+  document.getElementById("relatorio").innerHTML = html;
 }
+
 
 // ===============================
 // EXCLUIR

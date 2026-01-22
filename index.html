@@ -1,81 +1,80 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>🍧 Caixa Açaiteria</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <title>📊 Relatório de Vendas</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f9f9f9;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    .filtros, .resumo {
+      margin-bottom: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background: #eee;
+    }
+
+    button {
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+  </style>
 </head>
+<body>
 
-<body class="bg-gray-100 p-6">
+  <h2>📊 Relatório de Vendas</h2>
 
-<div class="max-w-6xl mx-auto bg-white rounded-xl shadow p-6">
-
-  <h1 class="text-3xl font-bold mb-6">🍧 Açaí do Bairro — Caixa</h1>
-
-  <!-- PREÇO / KG -->
-  <div class="grid grid-cols-3 gap-4 mb-6">
-    <div>
-      <label>Preço do KG (R$)</label>
-      <input id="precoKg" type="number" value="20" class="w-full border p-2 rounded" oninput="calcularTotal()">
-    </div>
-
-    <div>
-      <label>Quantidade (kg)</label>
-      <input id="kg" type="number" step="0.01" class="w-full border p-2 rounded" oninput="calcularTotal()">
-    </div>
-
-    <div class="bg-purple-600 text-white rounded p-4 text-center">
-      <div class="text-sm">TOTAL</div>
-      <div id="total" class="text-3xl font-bold">R$ 0,00</div>
-    </div>
+  <div class="filtros">
+    <input type="date" id="filtroData">
+    <select id="filtroPagamento">
+      <option value="">Todos</option>
+      <option value="Dinheiro">Dinheiro</option>
+      <option value="PIX">PIX</option>
+      <option value="Crédito">Crédito</option>
+      <option value="Débito">Débito</option>
+    </select>
+    <button onclick="buscarRelatorio()">Buscar</button>
   </div>
 
-  <!-- PAGAMENTOS -->
-  <h2 class="font-bold mb-2">Forma de Pagamento</h2>
-  <div class="grid grid-cols-5 gap-3 mb-4">
-    <button onclick="togglePagamento('Dinheiro')" class="btn">Dinheiro</button>
-    <button onclick="togglePagamento('PIX')" class="btn">PIX</button>
-    <button onclick="togglePagamento('Crédito')" class="btn">Crédito</button>
-    <button onclick="togglePagamento('Débito')" class="btn">Débito</button>
-    <button onclick="togglePagamento('Outro')" class="btn">Outro</button>
+  <div class="resumo">
+    <strong>Total Vendido:</strong> R$ <span id="totalVendas">0.00</span> |
+    <strong>Total KG:</strong> <span id="totalKg">0</span>
   </div>
 
-  <div id="pagamentos" class="mb-4"></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Pagamento</th>
+        <th>KG</th>
+        <th>Total</th>
+        <th>Pago</th>
+      </tr>
+    </thead>
+    <tbody id="tabelaVendas"></tbody>
+  </table>
 
-  <button onclick="finalizarVenda()" class="w-full bg-red-600 text-white py-3 rounded text-xl">
-    🔴 FINALIZAR VENDA
-  </button>
-
-  <hr class="my-6">
-
-  <!-- RELATÓRIO -->
-  <h2 class="text-xl font-bold mb-2">📊 Relatório do Dia</h2>
-  <button onclick="buscarRelatorio()" class="bg-blue-600 text-white px-4 py-2 rounded mb-2">
-    Buscar Relatório
-  </button>
-  <pre id="relatorio" class="bg-gray-100 p-3 rounded"></pre>
-
-  <hr class="my-6">
-
-  <!-- EXCLUSÃO -->
-  <h2 class="text-xl font-bold mb-2">🗑️ Excluir Venda</h2>
-  <input id="idExcluir" placeholder="ID da venda" class="border p-2 rounded w-1/2">
-  <button onclick="excluirVenda()" class="bg-black text-white px-4 py-2 rounded">
-    Excluir
-  </button>
-
-</div>
-
-<script src="script.js"></script>
-
-<style>
-  .btn {
-    background: #eee;
-    padding: 10px;
-    border-radius: 8px;
-    font-weight: bold;
-  }
-</style>
-
+  <script src="script.js"></script>
 </body>
 </html>

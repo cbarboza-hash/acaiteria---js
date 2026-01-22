@@ -74,7 +74,7 @@ async function finalizarVenda() {
 // ===============================
 const API_URL = "https://script.google.com/macros/s/AKfycbzsezBa1QuxLv6AmVzJ4CH2UXxRevQVS74V6L9pRs5y_gExE5cp1n50oCmp8n7078mTSw/exec";
 
-async function buscarRelatorio() {
+window.buscarRelatorio = async function() {
   const tabelaEl = document.getElementById("tabelaVendas");
   const totalVendasEl = document.getElementById("totalVendas");
   const totalKgEl = document.getElementById("totalKg");
@@ -89,7 +89,7 @@ async function buscarRelatorio() {
     const res = await fetch(`${API_URL}?payload=${payload}`);
     const json = await res.json();
 
-    const vendas = json.vendas.slice(1); // ignora cabeçalho
+    const vendas = json.vendas.slice(1);
 
     let totalVendas = 0;
     let totalKg = 0;
@@ -98,7 +98,6 @@ async function buscarRelatorio() {
 
     vendas.forEach(l => {
       const [, data, total, kg, forma, pago] = l;
-
       const dataVenda = new Date(data);
       const start = dataInicio ? new Date(dataInicio) : null;
       const end = dataFim ? new Date(dataFim) : null;
@@ -130,6 +129,7 @@ async function buscarRelatorio() {
     alert("Erro ao carregar relatório.");
   }
 }
+
 
 
 

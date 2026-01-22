@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbyEFsYZwHf53yE25lwEfr5UZg6ZhAT2YS_XARoCAMi7XZH5qg6WEBl20PkHzS4KC9X1XQ/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxE9-6hiJiYLOJZ4ogkduNo9HKKrNLxDcEAV4hPX1YuaiqFg2O2JxDhKk2dpyMn4koc8A/exec";
 
 let pagamentos = {};
 

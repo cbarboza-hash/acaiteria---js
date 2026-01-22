@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>🍧 Caixa Açaiteria</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-6">
+
+<div class="max-w-6xl mx-auto bg-white rounded-xl shadow p-6">
+
+  <h1 class="text-3xl font-bold mb-4">🍧 Açaí do Bairro — Caixa</h1>
+
+  <!-- ===== PREÇO / KG ===== -->
+  <div class="grid grid-cols-3 gap-4 mb-6">
+    <div>
+      <label>Preço do KG (R$)</label>
+      <input id="precoKg" type="number" value="20" class="w-full border p-2 rounded">
+    </div>
+
+    <div>
+      <label>Quantidade (kg)</label>
+      <input id="kg" type="number" step="0.01" class="w-full border p-2 rounded">
+    </div>
+
+    <div class="bg-purple-600 text-white rounded p-4 text-center">
+      <div class="text-sm">TOTAL</div>
+      <div id="total" class="text-3xl font-bold">R$ 0,00</div>
+    </div>
+  </div>
+
+  <!-- ===== PAGAMENTO ===== -->
+  <div class="grid grid-cols-5 gap-3 mb-4">
+    <button onclick="toggle('Dinheiro')" class="btn">Dinheiro</button>
+    <button onclick="toggle('PIX')" class="btn">PIX</button>
+    <button onclick="toggle('Crédito')" class="btn">Crédito</button>
+    <button onclick="toggle('Débito')" class="btn">Débito</button>
+    <button onclick="toggle('Outro')" class="btn">Outro</button>
+  </div>
+
+  <div id="pagamentos" class="mb-4"></div>
+
+  <button onclick="finalizarVenda()" class="w-full bg-red-600 text-white py-3 rounded text-xl">
+    🔴 FINALIZAR VENDA
+  </button>
+
+  <hr class="my-6">
+
+  <!-- ===== RELATÓRIO ===== -->
+  <h2 class="text-xl font-bold mb-2">📊 Relatório do Dia</h2>
+  <div id="relatorio"></div>
+
+  <hr class="my-6">
+
+  <!-- ===== EXCLUSÃO ===== -->
+  <h2 class="text-xl font-bold mb-2">🗑️ Excluir Venda</h2>
+  <input id="idExcluir" placeholder="ID da venda" class="border p-2 rounded w-1/2">
+  <button onclick="excluirVenda()" class="bg-black text-white px-4 py-2 rounded">
+    Excluir
+  </button>
+
+</div>
+
+<script src="script.js"></script>
+
+<style>
+  .btn {
+    background:#eee;
+    padding:10px;
+    border-radius:8px;
+    font-weight:bold;
+  }
+</style>
+
+</body>
+</html>

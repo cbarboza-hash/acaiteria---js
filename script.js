@@ -1,5 +1,19 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbyQh_3tjLL4Ox48S91cphdCdrXnlNpfm1WGYPVrMPRA5bN3MHeR8AgMcndXh2u0n6lDqw/exec";
 
+function calcularTotal() {
+  const precoKg = parseFloat(document.getElementById("precoKg").value) || 0;
+  const kg = parseFloat(document.getElementById("kg").value) || 0;
+
+  const total = precoKg * kg;
+
+  document.getElementById("total").innerText =
+    total.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+}
+
+
 async function buscarRelatorio() {
   const dataFiltro = document.getElementById("filtroData").value;
   const pagamentoFiltro = document.getElementById("filtroPagamento").value;

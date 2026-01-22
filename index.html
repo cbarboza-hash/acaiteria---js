@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>🍧 Caixa Açaiteria</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -10,7 +10,7 @@
 
 <div class="max-w-6xl mx-auto bg-white rounded-xl shadow p-6">
 
-  <h1 class="text-3xl font-bold mb-4">🍧 Açaí do Bairro — Caixa</h1>
+  <h1 class="text-3xl font-bold mb-6">🍧 Açaí do Bairro — Caixa</h1>
 
   <!-- PREÇO / KG -->
   <div class="grid grid-cols-3 gap-4 mb-6">
@@ -30,13 +30,14 @@
     </div>
   </div>
 
-  <!-- PAGAMENTO -->
+  <!-- PAGAMENTOS -->
+  <h2 class="font-bold mb-2">Forma de Pagamento</h2>
   <div class="grid grid-cols-5 gap-3 mb-4">
-    <button onclick="abrirPagamento('dinheiro')" class="btn">Dinheiro</button>
-    <button onclick="abrirPagamento('pix')" class="btn">PIX</button>
-    <button onclick="abrirPagamento('credito')" class="btn">Crédito</button>
-    <button onclick="abrirPagamento('debito')" class="btn">Débito</button>
-    <button onclick="abrirPagamento('outro')" class="btn">Outro</button>
+    <button onclick="togglePagamento('Dinheiro')" class="btn">Dinheiro</button>
+    <button onclick="togglePagamento('PIX')" class="btn">PIX</button>
+    <button onclick="togglePagamento('Crédito')" class="btn">Crédito</button>
+    <button onclick="togglePagamento('Débito')" class="btn">Débito</button>
+    <button onclick="togglePagamento('Outro')" class="btn">Outro</button>
   </div>
 
   <div id="pagamentos" class="mb-4"></div>
@@ -50,9 +51,9 @@
   <!-- RELATÓRIO -->
   <h2 class="text-xl font-bold mb-2">📊 Relatório do Dia</h2>
   <button onclick="buscarRelatorio()" class="bg-blue-600 text-white px-4 py-2 rounded mb-2">
-    Atualizar Relatório
+    Buscar Relatório
   </button>
-  <div id="relatorio"></div>
+  <pre id="relatorio" class="bg-gray-100 p-3 rounded"></pre>
 
   <hr class="my-6">
 
@@ -69,10 +70,10 @@
 
 <style>
   .btn {
-    background:#eee;
-    padding:10px;
-    border-radius:8px;
-    font-weight:bold;
+    background: #eee;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
   }
 </style>
 

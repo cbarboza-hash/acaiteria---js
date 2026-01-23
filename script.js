@@ -87,28 +87,37 @@ async function finalizarVenda() {
     return;
   }
 
-  // Se houver apenas uma forma e o valor estiver 0, preenche automaticamente com total
   const formas = Object.keys(pagamentos);
-  if (formas.length === 1 && pagamentos[formas[0]] === 0) {
-    pagamentos[formas[0]] = totalVenda;
+  if (formas.length === 0) {
+    alert("Escolha ao menos uma forma de pagamento");
+    return;
   }
 
-  // Verifica se o total pago bate com totalVenda
-  const totalPago = Object.values(pagamentos).reduce((a,b)=>a+b,0);
-  if (totalPago < totalVenda) {
-    if (!formas.includes("Dinheiro")) {
-      // Permite se for apenas dinheiro
-      alert("O total pago é menor que o total da venda!");
-      return;
+  // Distribuir valores sem ultrapassar totalVenda
+  let totalDistribuido = 0;
+  const pagamentosRegistrar = {};
+
+  formas.forEach((forma, index) => {
+    let valor = Number(pagamentos[forma] || 0);
+
+    // Se for a última forma, garante que soma exatamente totalVenda
+    if (index === formas.length - 1) {
+      valor = totalVenda - totalDistribuido;
+    } else {
+      // Não pode ultrapassar o totalVenda
+      if (valor + totalDistribuido > totalVenda) valor = totalVenda - totalDistribuido;
     }
-  }
+
+    pagamentosRegistrar[forma] = valor;
+    totalDistribuido += valor;
+  });
 
   const payload = encodeURIComponent(JSON.stringify({
     action: "venda",
     dados: {
       total: totalVenda,
       kg,
-      pagamentos
+      pagamentos: pagamentosRegistrar
     }
   }));
 
@@ -124,3 +133,4 @@ async function finalizarVenda() {
   document.getElementById("kg").value = "";
   calcularTotal();
 }
+

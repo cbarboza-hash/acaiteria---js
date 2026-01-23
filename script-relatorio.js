@@ -22,8 +22,11 @@ async function buscarRelatorio() {
 
     tabelaEl.innerHTML = "";
 
+    // Para controlar IDs já contados e evitar duplicar KG
+    const idsContados = new Set();
+
     vendas.forEach(l => {
-      const [, data, total, kg, forma, pago] = l;
+      const [idVenda, data, total, kg, forma, pago] = l;
 
       // Transformar data da planilha em ano-mês-dia
       const dataVendaFull = new Date(data);
@@ -42,8 +45,14 @@ async function buscarRelatorio() {
       if (end && dataVenda > end) return;
       if (filtroPagamento && forma !== filtroPagamento) return;
 
-      totalVendas += Number(pago || 0);
-      totalKg += Number(kg || 0);
+      // Somar VALOR_TOTAL para o total de vendas
+      totalVendas += Number(total || 0);
+
+      // Somar KG apenas uma vez por ID
+      if (!idsContados.has(idVenda)) {
+        totalKg += Number(kg || 0);
+        idsContados.add(idVenda);
+      }
 
       // Formata a data para DD/MM/YYYY
       const dataFormatada = ("0" + dia).slice(-2) + "/" + ("0" + (mes + 1)).slice(-2) + "/" + ano;
